@@ -1,9 +1,13 @@
 package simplebouncingball;
 
+/**
+ * Simple enum for indicating program state to the RenderPanel
+ * 
+ * @author tajahem
+ *
+ */
 public enum GameState {
-
-	MENU,
-	NORMAL,
+	MENU, 
+	MAIN,
 	QUIT
-	
 }

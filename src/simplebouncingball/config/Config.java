@@ -8,6 +8,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Fetches and stores configuration information from the config.ini file. Throws
+ * a runtime exception if all of the keys are not present, and throws other
+ * exceptions if any of the data fails to parse correctly.
+ * 
+ * @author tajahem
+ *
+ */
 public class Config {
 
 	public static final String configLocation = "config.ini";
@@ -40,14 +48,14 @@ public class Config {
 
 			String line = reader.readLine();
 			while (line != null) {
-				// ignore blank and commented lines
-				if (!line.isEmpty() && !line.startsWith("#")) {
+				// ignore anything without an assignment operator
+				if (line.contains("=")) {
 					int splitPoint = line.indexOf('=');
 					try {
 						settings.put(line.substring(0, splitPoint),
 								line.substring(splitPoint + 1));
 					} catch (StringIndexOutOfBoundsException s) {
-					}
+					}// prevent crashing in case someone writes a line of '='
 				}
 				line = reader.readLine();
 			}
@@ -59,6 +67,7 @@ public class Config {
 		return settings;
 	}
 
+	// wondering if this couldn't be condensed and rolled into validation
 	private void setValues(Map<String, String> settings) {
 		parseSize(settings.get(keys[0]));
 		ballSize = Integer.parseInt(settings.get(keys[1]));
@@ -85,11 +94,12 @@ public class Config {
 		return new Color(r, g, b);
 	}
 
+	// Make sure all of the keys exist
 	private void validate(Map<String, String> settings) {
 		boolean valid = true;
 		InvalidConfigException ice = new InvalidConfigException();
 		for (String s : keys) {
-			if (!settings.containsKey(s)) {
+			if (!settings.containsKey(s) || settings.get(s).isEmpty()) {
 				valid = false;
 				ice.addDetail("\n  " + s
 						+ " value missing or invalid in configuration");

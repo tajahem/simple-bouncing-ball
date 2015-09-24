@@ -1,0 +1,27 @@
+body {
+    background: #c4dee3;
+    text-align: center;
+}
+#container {
+    margin: auto;
+    background: white;
+    width: 75%;
+    border: 1px solid black;
+    padding-bottom: 25px;
+}
+#bounce {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width:  400px;
+    height: 200px;
+    border: 1px solid black;
+}
+#controls {
+    margin-left: auto;
+    margin-right: auto;
+    background: #c9c9c9;
+    width: 390px;
+    padding: 5px;
+    border: 1px solid black;
+}

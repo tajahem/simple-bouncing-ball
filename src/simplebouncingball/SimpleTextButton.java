@@ -8,6 +8,14 @@ import java.awt.Rectangle;
 
 import simplebouncingball.config.Config;
 
+/**
+ * 
+ * A simple flat button with text. Selection testing is done via the
+ * contains(Point p) method.
+ * 
+ * @author tajahem
+ *
+ */
 public class SimpleTextButton {
 
 	private Rectangle bounds;
@@ -35,10 +43,11 @@ public class SimpleTextButton {
 		renderText(g2d);
 	}
 
+	// attempts to center the text in the middle of the button
 	private void renderText(Graphics2D g2d) {
 		FontMetrics metrics = g2d.getFontMetrics();
-		// allows overflow if not careful
-		int textX = (int) (bounds.getCenterX() - metrics.stringWidth(name) / 2) ;
+		// allows overflow if button is not large enough
+		int textX = (int) (bounds.getCenterX() - metrics.stringWidth(name) / 2);
 		int textY = (int) (bounds.getCenterY() + metrics.getHeight() / 2 - metrics
 				.getDescent() / 2);
 		g2d.drawString(name, textX, textY);

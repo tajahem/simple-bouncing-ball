@@ -1,5 +1,11 @@
 package simplebouncingball.config;
 
+/**
+ * A runtime exception thrown when configuration data is missing
+ * 
+ * @author tajahem
+ *
+ */
 public class InvalidConfigException extends RuntimeException {
 
 	String details = "";
