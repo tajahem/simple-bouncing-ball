@@ -3,8 +3,10 @@ package simplebouncingball.ball;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
+import javafx.scene.shape.Ellipse;
 import simplebouncingball.config.Config;
 import simplebouncingball.input.InputListener;
 import simplebouncingball.input.InputType;
@@ -17,34 +19,39 @@ public class Ball {
 	 * correctly the ball utilizes BufferedImages to create virtual coordinate
 	 * spaces to work in.
 	 */
-	private int renderSize;
-	// position of the virtual coordinate space in relation to the view
-	private Point position;
+	private Rectangle renderArea;
+	private Rectangle bounceArea;
 	// position of the ball in virtual coordinate space
 	private Point ballPosition;
 	private final Point lightSource;// intended for an eventual shadow effect
 	private Velocity velocity;
-	private Range range;
+
+	private Rectangle bounds;
 
 	// visual variables
 	private Config config;
-	private Color shadow = new Color(50, 50, 50, 25);
+	private Color shadow = new Color(50, 50, 50, 50);
 	private RoundingEffect rounding;
 	private ColorManager color = new ColorManager();
 
 	public Ball(Config c, Point l) {
 		config = c;
 		lightSource = l;
-		renderSize = config.ballSize * 2;
 
 		velocity = new Velocity(config.maxVelocity);
 		rounding = new RoundingEffect(config);
 
 		// start at center
-		position = getCenter(config.width, config.height, renderSize);
-		ballPosition = getCenter(renderSize, renderSize, config.ballSize);
-		int modifier = (int) (config.ballSize * 1.5);
-		range = new Range(config.width - modifier, -config.ballSize / 2);
+		Point initPosition = getCenter(config.width, config.height,
+				config.ballSize * 2);
+		renderArea = new Rectangle(initPosition.x, initPosition.y,
+				config.ballSize * 2, config.ballSize * 2);
+		ballPosition = getCenter(renderArea.width, renderArea.height,
+				config.ballSize);
+		bounds = new Rectangle(0, 0, config.width, config.height);
+		int halfBall = config.ballSize / 2;
+		bounceArea = new Rectangle(halfBall, halfBall, config.width
+				- config.ballSize, config.height - config.ballSize);
 	}
 
 	private Point getCenter(int width, int height, int size) {
@@ -52,13 +59,26 @@ public class Ball {
 	}
 
 	private void move() {
-		if (!range.isInRange(position.x, velocity.getX())) {
-			velocity.reverseX();
+		renderArea.translate(velocity.getX(), velocity.getY());
+		if (!bounds.contains(renderArea)) {
+			if (renderArea.x < bounds.x) {
+				// should be negative so make it positive to get to bounds.x
+				renderArea.translate(-renderArea.x, 0);
+				velocity.reverseX();
+			} else if (renderArea.getMaxX() > bounds.getMaxX()) {
+				renderArea.translate(
+						(int) (bounds.getMaxX() - renderArea.getMaxX()), 0);
+				velocity.reverseX();
+			}
+			if (renderArea.y < bounds.y) {
+				renderArea.translate(0, -renderArea.y);
+				velocity.reverseY();
+			} else if (renderArea.getMaxY() > bounds.getMaxY()) {
+				renderArea.translate(0,
+						(int) (bounds.getMaxY() - renderArea.getMaxY()));
+				velocity.reverseY();
+			}
 		}
-		if (!range.isInRange(position.y, velocity.getY())) {
-			velocity.reverseY();
-		}
-		position.translate(velocity.getX(), velocity.getY());
 	}
 
 	public void update(InputListener input) {
@@ -84,8 +104,8 @@ public class Ball {
 	}
 
 	public void render(Graphics2D g2d) {
-		BufferedImage render = new BufferedImage(renderSize, renderSize,
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage render = new BufferedImage(renderArea.width,
+				renderArea.height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D graphics = render.createGraphics();
 
 		graphics.setColor(shadow);
@@ -93,7 +113,9 @@ public class Ball {
 				config.ballSize + 10, config.ballSize + 10);
 		graphics.drawImage(renderBall(), null, ballPosition.x, ballPosition.y);
 
-		g2d.drawImage(render, null, position.x, position.y);
+		g2d.setColor(shadow);
+		g2d.fill(bounceArea);
+		g2d.drawImage(render, null, renderArea.x, renderArea.y);
 	}
 
 	private BufferedImage renderBall() {
