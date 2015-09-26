@@ -38,7 +38,7 @@ public class Menu implements GameView {
 				buttonWidth, buttonHeight, config, "QUIT");
 		controlsDisplay = new SimpleTextButton(config.width / 20, firstY
 				+ buttonHeight * 4, config.width - config.width / 10,
-				config.width - (firstY + buttonHeight * 6), config, controls);
+				config.height - (firstY + buttonHeight * 6), config, controls);
 	}
 
 	@Override
