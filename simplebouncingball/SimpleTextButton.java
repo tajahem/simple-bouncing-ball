@@ -1,5 +1,6 @@
 package simplebouncingball;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -19,15 +20,17 @@ import simplebouncingball.config.Config;
 public class SimpleTextButton {
 
 	private Rectangle bounds;
-	private Config config;
 	private String name;
 	private Font font;
+	private Color bgColor;
+	private Color textColor;
 
 	public SimpleTextButton(int x, int y, int w, int h, Config c, String n) {
 		bounds = new Rectangle(x, y, w, h);
-		config = c;
 		name = n;
-		font = new Font(config.font, Font.BOLD, config.textSize);
+		bgColor = c.menuColor;
+		textColor = c.textColor;
+		font = new Font(c.font, Font.BOLD, c.textSize);
 	}
 
 	public boolean contains(Point p) {
@@ -35,9 +38,9 @@ public class SimpleTextButton {
 	}
 
 	public void render(Graphics2D g2d) {
-		g2d.setColor(config.menuColor);
+		g2d.setColor(bgColor);
 		g2d.fill(bounds);
-		g2d.setColor(config.textColor);
+		g2d.setColor(textColor);
 		g2d.draw(bounds);
 		g2d.setFont(font);
 		renderText(g2d);
@@ -51,6 +54,19 @@ public class SimpleTextButton {
 		int textY = (int) (bounds.getCenterY() + metrics.getHeight() / 2 - metrics
 				.getDescent() / 2);
 		g2d.drawString(name, textX, textY);
+	}
+
+	public void setColors(Color bg, Color text) {
+		bgColor = bg;
+		textColor = text;
+	}
+
+	public void setBGColor(Color c) {
+		bgColor = c;
+	}
+
+	public void setTextColor(Color c) {
+		textColor = c;
 	}
 
 }
