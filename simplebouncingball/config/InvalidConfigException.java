@@ -6,6 +6,7 @@ package simplebouncingball.config;
  * @author tajahem
  *
  */
+@SuppressWarnings("serial")
 public class InvalidConfigException extends RuntimeException {
 
 	String details = "";

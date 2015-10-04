@@ -20,64 +20,69 @@ public class Config {
 
 	public static final String configLocation = "config.ini";
 
-	private final String[] keys = { "Window_Size", "Ball_Size", "Max_Velocity",
-			"BG_Color", "Ball_Color", "Menu_BG_Color", "Text_Color", "Font",
-			"Text_Size" };
-
 	public int width, height;
 	public int ballSize;
 	public int maxVelocity;
 	public int textSize;
 	public Color background;
-	public Color initialBallColor;
 	public Color menuColor;
 	public Color textColor;
+	public Color highlight;
+	public Color shadow;
 	public String font;
 
 	public Config() {
-		Map<String, String> settings = readConfigFile();
+		Map<String, String> settings = null;
+		try {
+			settings = readConfigFile();
+		} catch (IOException e) {
+			// attempt to create a new configuration file once
+			new ConfigCreator();
+			try {
+				settings = readConfigFile();
+			} catch (IOException f) {
+				// things really did not go well
+				System.err.println("Configuration error");
+				f.printStackTrace();
+				System.exit(0);
+			}
+		}
 		validate(settings);
 		setValues(settings);
 	}
 
-	private Map<String, String> readConfigFile() {
+	private Map<String, String> readConfigFile() throws IOException {
 		Map<String, String> settings = new HashMap<>();
-		try {
-			BufferedReader reader = new BufferedReader(new FileReader(new File(
-					configLocation)));
+		BufferedReader reader = new BufferedReader(new FileReader(new File(configLocation)));
 
-			String line = reader.readLine();
-			while (line != null) {
-				// ignore anything without an assignment operator
-				if (line.contains("=")) {
-					int splitPoint = line.indexOf('=');
-					try {
-						settings.put(line.substring(0, splitPoint),
-								line.substring(splitPoint + 1));
-					} catch (StringIndexOutOfBoundsException s) {
-					}// prevent crashing in case someone writes a line of '='
-				}
-				line = reader.readLine();
+		String line = reader.readLine();
+		while (line != null) {
+			// ignore anything without an assignment operator
+			if (line.contains("=")) {
+				int splitPoint = line.indexOf('=');
+				try {
+					settings.put(line.substring(0, splitPoint), line.substring(splitPoint + 1));
+				} catch (StringIndexOutOfBoundsException s) {
+				} // prevent crashing in case someone writes a line of '='
 			}
-			reader.close();
-		} catch (IOException e) {
-			System.err.println("ERROR: config.ini corrupted or missing");
-			System.exit(0);
+			line = reader.readLine();
 		}
+		reader.close();
+
 		return settings;
 	}
 
-	// wondering if this couldn't be condensed and rolled into validation
 	private void setValues(Map<String, String> settings) {
-		parseSize(settings.get(keys[0]));
-		ballSize = Integer.parseInt(settings.get(keys[1]));
-		maxVelocity = Integer.parseInt(settings.get(keys[2]));
-		background = parseColor(settings.get(keys[3]));
-		initialBallColor = parseColor(settings.get(keys[4]));
-		menuColor = parseColor(settings.get(keys[5]));
-		textColor = parseColor(settings.get(keys[6]));
-		font = settings.get(keys[7]);
-		textSize = Integer.parseInt(settings.get(keys[8]));
+		parseSize(settings.get(ConfigOption.WINDOW_SIZE.key));
+		ballSize = Integer.parseInt(settings.get(ConfigOption.BALL_SIZE.key));
+		maxVelocity = Integer.parseInt(settings.get(ConfigOption.MAX_VELOCITY.key));
+		background = parseColor(settings.get(ConfigOption.BG_COLOR.key));
+		menuColor = parseColor(settings.get(ConfigOption.MENU_BG_COLOR.key));
+		textColor = parseColor(settings.get(ConfigOption.TEXT_COLOR.key));
+		highlight = parseColor(settings.get(ConfigOption.HIGHLIGHT_COLOR.key));
+		shadow = parseColor(settings.get(ConfigOption.SHADOW_COLOR.key));
+		font = settings.get(ConfigOption.FONT_STYLE.key);
+		textSize = Integer.parseInt(settings.get(ConfigOption.FONT_SIZE.key));
 	}
 
 	private void parseSize(String s) {
@@ -91,22 +96,26 @@ public class Config {
 		int r = Integer.parseInt(values[0].trim());
 		int g = Integer.parseInt(values[1].trim());
 		int b = Integer.parseInt(values[2].trim());
-		return new Color(r, g, b);
+		int a = 255;
+		if (values.length > 3) {
+			a = Integer.parseInt(values[3].trim());
+		}
+		return new Color(r, g, b, a);
 	}
 
 	// Make sure all of the keys exist
 	private void validate(Map<String, String> settings) {
 		boolean valid = true;
 		InvalidConfigException ice = new InvalidConfigException();
-		for (String s : keys) {
-			if (!settings.containsKey(s) || settings.get(s).isEmpty()) {
+		for (ConfigOption s : ConfigOption.values()) {
+			if (!settings.containsKey(s.key) || settings.get(s.key).isEmpty()) {
 				valid = false;
-				ice.addDetail("\n  " + s
-						+ " value missing or invalid in configuration");
+				ice.addDetail("\n  " + s + " value missing or invalid in configuration");
 			}
 		}
 		if (!valid) {
 			throw ice;
 		}
 	}
+
 }
