@@ -1,6 +1,6 @@
 package simplebouncingball.ball;
 
-import java.awt.Color;
+import java.awt.BasicStroke;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -18,8 +18,6 @@ import simplebouncingball.config.Config;
 public class RoundingEffect {
 
 	private BufferedImage rounding;
-	private final Color roundingColor = new Color(255, 255, 255, 10);
-	private final Color border = new Color(0, 0, 0, 200);
 
 	public RoundingEffect(Config config) {
 		createRounding(config);
@@ -32,12 +30,15 @@ public class RoundingEffect {
 		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
 				RenderingHints.VALUE_ANTIALIAS_ON);
 
-		g2d.setColor(roundingColor);
+		g2d.setColor(config.highlight);
 		for (int n = 2; n < config.ballSize; n += 2) {
 			g2d.fillOval(n, n, config.ballSize - n * 2, config.ballSize - n * 2);
 		}
-		g2d.setColor(border);
-		g2d.drawOval(0, 0, config.ballSize - 2, config.ballSize - 2);
+		g2d.setColor(config.shadow);
+		for(int n =1; n < 3;n++){
+			g2d.setStroke(new BasicStroke(n));
+			g2d.drawOval(0, 0, config.ballSize - 2, config.ballSize - 2);
+		}
 	}
 
 	public BufferedImage getRounding() {

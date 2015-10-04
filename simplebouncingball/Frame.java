@@ -15,6 +15,7 @@ import simplebouncingball.input.InputListener;
  * @author tajahem
  *
  */
+@SuppressWarnings("serial")
 public class Frame extends JFrame {
 
 	private Config config;

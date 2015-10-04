@@ -1,11 +1,19 @@
 package simplebouncingball.views;
 
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 
 import simplebouncingball.GameState;
 import simplebouncingball.GameView;
-import simplebouncingball.SimpleTextButton;
+import simplebouncingball.button.BorderedBackground;
+import simplebouncingball.button.ButtonBackground;
+import simplebouncingball.button.HoverableButton;
+import simplebouncingball.button.SimpleTextButton;
+import simplebouncingball.button.TextElement;
+import simplebouncingball.button.hover.GlowEffect;
 import simplebouncingball.config.Config;
 import simplebouncingball.input.InputListener;
 import simplebouncingball.input.InputType;
@@ -13,11 +21,11 @@ import simplebouncingball.input.InputType;
 public class Menu implements GameView {
 
 	private Config config;
-	SimpleTextButton start;
-	SimpleTextButton quit;
+	private HoverableButton start;
+	private HoverableButton quit;
 
 	// Just to display controls text
-	SimpleTextButton controlsDisplay;
+	private SimpleTextButton controlsDisplay;
 	private final char left = '\u21E6';
 	private final char up = '\u21E7';
 	private final char right = '\u21E8';
@@ -32,10 +40,21 @@ public class Menu implements GameView {
 		int buttonHeight = (int) (config.textSize * 2.5);
 		int buttonX = config.width / 2 - buttonWidth / 2;
 		int firstY = buttonHeight * 2;
-		start = new SimpleTextButton(buttonX, firstY, buttonWidth,
-				buttonHeight, config, "START");
-		quit = new SimpleTextButton(buttonX, firstY + buttonHeight * 2,
-				buttonWidth, buttonHeight, config, "QUIT");
+
+		Rectangle elementSize = new Rectangle(0, 0, buttonWidth, buttonHeight);
+		Color glowColor = new Color(config.textColor.getRed(),
+				config.textColor.getGreen(), config.textColor.getBlue(), 100);
+		GlowEffect glow = new GlowEffect(glowColor, elementSize);
+		ButtonBackground background = new BorderedBackground(elementSize,
+				config.menuColor, config.textColor);
+		Font font = new Font(config.font, Font.BOLD, config.textSize);
+		start = new HoverableButton(new Rectangle(buttonX, firstY, buttonWidth,
+				buttonHeight), glow, background);
+		start.setText(new TextElement(config.textColor, "START", font));
+		quit = new HoverableButton(new Rectangle(buttonX, firstY + buttonHeight
+				* 2, buttonWidth, buttonHeight), glow, background);
+		quit.setText(new TextElement(config.textColor, "QUIT", font));
+
 		controlsDisplay = new SimpleTextButton(config.width / 20, firstY
 				+ buttonHeight * 4, config.width - config.width / 10,
 				config.height - (firstY + buttonHeight * 6), config, controls);
@@ -54,15 +73,19 @@ public class Menu implements GameView {
 	public GameState update(InputListener input) {
 		if (input.hasMouseInput()) {
 			Point p = input.getLastClick();
-			if (start.contains(p)) {
+			if (start.isSelected(p)) {
 				return GameState.MAIN;
 			}
-			if (quit.contains(p)) {
+			if (quit.isSelected(p)) {
 				return GameState.QUIT;
 			}
 		}
 		if (input.activeInputs.contains(InputType.ESC)) {
 			return GameState.QUIT;
+		}
+		if (input.mouseLocation != null) {
+			start.checkForHovered(input.mouseLocation);
+			quit.checkForHovered(input.mouseLocation);
 		}
 		return GameState.MENU;
 	}

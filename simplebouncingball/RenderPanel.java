@@ -19,6 +19,7 @@ import simplebouncingball.views.Menu;
  * @author tajahem
  *
  */
+@SuppressWarnings("serial")
 public class RenderPanel extends JPanel {
 
 	private Config config;
@@ -33,16 +34,21 @@ public class RenderPanel extends JPanel {
 
 	@Override
 	public void paintComponent(Graphics g) {
-		BufferedImage render = new BufferedImage(config.width, config.height,
-				BufferedImage.TYPE_INT_ARGB);
+		BufferedImage render = new BufferedImage(config.width, config.height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2d = render.createGraphics();
-		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-				RenderingHints.VALUE_ANTIALIAS_ON);
+		g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 		view.render(g2d);
 		// render to parent
 		g.drawImage(render, 0, 0, null);
 	}
 
+	/**
+	 * Update the current view depending on user input. Returns false if the
+	 * loop should stop and the program should exit.
+	 * 
+	 * @param input
+	 * @return
+	 */
 	public boolean update(InputListener input) {
 		GameState updatedState = view.update(input);
 		if (updatedState == GameState.QUIT) {
@@ -50,16 +56,19 @@ public class RenderPanel extends JPanel {
 		}
 		if (updatedState != currentState) {
 			currentState = updatedState;
-			changeState();
+			createView();
 		}
 		return true;
 	}
 
-	private void changeState() {
-		if(currentState == GameState.MENU){
+	/**
+	 * Create the view based on the currentState
+	 */
+	private void createView() {
+		if (currentState == GameState.MENU) {
 			view = new Menu(config);
 		}
-		if(currentState == GameState.MAIN){
+		if (currentState == GameState.MAIN) {
 			view = new MainView(config);
 		}
 	}

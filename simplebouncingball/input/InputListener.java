@@ -6,6 +6,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -16,7 +17,8 @@ import java.util.Set;
  * @author tajahem
  *
  */
-public class InputListener implements KeyListener, MouseListener {
+public class InputListener implements KeyListener, MouseListener,
+		MouseMotionListener {
 
 	/*
 	 * The KeyListener doesn't work on a panel and adjusting the mouse input for
@@ -26,8 +28,10 @@ public class InputListener implements KeyListener, MouseListener {
 	public InputListener(Component k, Component m) {
 		k.addKeyListener(this);
 		m.addMouseListener(this);
+		m.addMouseMotionListener(this);
 	}
 
+	public Point mouseLocation;
 	private Point lastClick;
 	private InputType lastTyped;
 	public Set<InputType> activeInputs = new HashSet<>();
@@ -108,6 +112,11 @@ public class InputListener implements KeyListener, MouseListener {
 		lastClick = e.getPoint();
 	}
 
+	@Override
+	public void mouseMoved(MouseEvent e) {
+		mouseLocation = e.getPoint();
+	}
+
 	// unused interface methods
 
 	@Override
@@ -120,6 +129,10 @@ public class InputListener implements KeyListener, MouseListener {
 
 	@Override
 	public void mousePressed(MouseEvent e) {
+	}
+
+	@Override
+	public void mouseDragged(MouseEvent e) {
 	}
 
 }

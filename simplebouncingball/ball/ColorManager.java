@@ -2,9 +2,16 @@ package simplebouncingball.ball;
 
 import java.awt.Color;
 
+/**
+ * A ColorManager stores red, green and blue values and will return a new color
+ * each time the getColor method is called. The initial color is 255,150,0
+ * 
+ * @author tajahem
+ *
+ */
 public class ColorManager {
 
-	private final Range rangeChecker = new Range(255, 0);
+	private final IntegerRange rangeChecker = new IntegerRange(255, 0);
 	private int[] change = new int[3];
 	public int[] color = new int[3];
 
@@ -26,6 +33,11 @@ public class ColorManager {
 		}
 	}
 
+	/**
+	 * Returns a new java.awt.Color with the next updated color values
+	 * 
+	 * @return
+	 */
 	public Color getColor() {
 		update();
 		return new Color(color[0], color[1], color[2]);

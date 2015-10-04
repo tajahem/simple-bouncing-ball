@@ -2,11 +2,11 @@ package simplebouncingball.ball;
 
 public class Velocity {
 
-	private final Range rangeChecker;
+	private final IntegerRange rangeChecker;
 	private int x = 0, y = 0;
 
 	public Velocity(int max) {
-		rangeChecker = new Range(max, -max);
+		rangeChecker = new IntegerRange(max, -max);
 	}
 
 	public void modifyX(int amount) {

@@ -1,14 +1,16 @@
 package simplebouncingball.views;
 
-import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.Point;
-import java.util.Random;
+import java.awt.Rectangle;
 
 import simplebouncingball.GameState;
 import simplebouncingball.GameView;
-import simplebouncingball.SimpleTextButton;
 import simplebouncingball.ball.Ball;
+import simplebouncingball.button.BorderedBackground;
+import simplebouncingball.button.HoverableButton;
+import simplebouncingball.button.TextElement;
+import simplebouncingball.button.hover.OverlayColorEffect;
 import simplebouncingball.config.Config;
 import simplebouncingball.input.InputListener;
 import simplebouncingball.input.InputType;
@@ -17,24 +19,26 @@ public class MainView implements GameView {
 
 	private Config config;
 	private Ball ball;
-	private SimpleTextButton close;
+	private HoverableButton closeButton;
 
 	public MainView(Config config) {
 		this.config = config;
-		Random random = new Random();
-		ball = new Ball(config, new Point(random.nextInt(config.width),
-				random.nextInt(config.height)));
-		close = new SimpleTextButton(-2, -2, config.width / 20,
-				config.ballSize / 2, config, "X");
-		close.setColors(config.background, new Color(100, 100, 100, 150));
+		ball = new Ball(config);
+		Rectangle buttonPosition = new Rectangle(-2, -2, config.width / 20, config.ballSize / 2);
+		TextElement text = new TextElement(config.textColor, "X", new Font(config.font, Font.BOLD, config.textSize));
+		OverlayColorEffect effect = new OverlayColorEffect(buttonPosition, config.textColor);
+		effect.setText(text);
+		closeButton = new HoverableButton(buttonPosition, effect,
+				new BorderedBackground(buttonPosition, config.background, config.shadow));
+		closeButton.setText(text.clone(config.shadow));
 	}
 
 	@Override
 	public void render(Graphics2D g2d) {
 		g2d.setColor(config.background);
 		g2d.fillRect(0, 0, config.width, config.height);
+		closeButton.render(g2d);
 		ball.render(g2d);
-		close.render(g2d);
 	}
 
 	@Override
@@ -46,10 +50,11 @@ public class MainView implements GameView {
 			}
 		}
 		if (input.hasMouseInput()) {
-			if (close.contains(input.getLastClick())) {
+			if (closeButton.isSelected(input.getLastClick())) {
 				return GameState.MENU;
 			}
 		}
+		closeButton.checkForHovered(input.mouseLocation);
 		ball.update(input);
 		return GameState.MAIN;
 	}
