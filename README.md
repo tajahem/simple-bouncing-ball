@@ -1,17 +1,17 @@
-#Simple Bouncing Ball#
+# Simple Bouncing Ball
 ---
 
-##Description##
+## Description
 
 A simple controllable ball that bounces off the edges of the window/shaded area. Includes both a Java and Javascript version.
 
-##Building and Running##
+## Building and Running
 
-###Javascript###
+### Javascript
 
 The Javascript folder includes a simple html page to run the script. Download the Javascript folder and open the page in your browser of choice.
 
-###Java###
+### Java
 
 The Java version of Simple Bouncing Ball has been constructed with only the JavaSE libraries so only the JDK is required. It has been built and tested using version 1.8 of the JVM, but earlier versions may work. YMMV. 
 
